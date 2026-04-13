@@ -4,6 +4,8 @@ const app = express();
 const { Client, GatewayIntentBits } = require("discord.js");
 const axios = require("axios");
 
+console.log("🚀 Iniciando bot...");
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -12,25 +14,28 @@ const client = new Client({
   ],
 });
 
-// 🌐 servidor pra Render não dormir
+// 🌐 Servidor (Render precisa disso)
 app.get("/", (req, res) => {
   res.send("Bot online 🤖");
 });
 
 app.listen(3000, () => {
-  console.log("Servidor rodando");
+  console.log("🌐 Servidor rodando na porta 3000");
 });
 
-// 🤖 bot pronto
+// 🤖 Quando o bot logar no Discord
 client.once("ready", () => {
-  console.log(`Logado como ${client.user.tag}`);
+  console.log(`🤖 LOGADO COMO: ${client.user.tag}`);
 });
 
+// 💬 Mensagens no Discord
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   if (message.mentions.has(client.user)) {
-    const prompt = message.content.replace(`<@${client.user.id}>`, "").trim();
+    const prompt = message.content
+      .replace(`<@${client.user.id}>`, "")
+      .trim();
 
     if (!prompt) return message.reply("Fala algo 😎");
 
@@ -58,10 +63,21 @@ client.on("messageCreate", async (message) => {
 
       message.reply(res.data.choices[0].message.content);
     } catch (err) {
-      console.log(err);
+      console.log("❌ ERRO NA IA:", err.response?.data || err.message);
       message.reply("Erro na IA ❌");
     }
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+// 🔑 LOGIN DO BOT (COM DEBUG)
+console.log("🔑 Tentando logar no Discord...");
+
+client
+  .login(process.env.DISCORD_TOKEN)
+  .then(() => {
+    console.log("✅ Login enviado com sucesso");
+  })
+  .catch((err) => {
+    console.log("❌ ERRO NO LOGIN DO DISCORD:");
+    console.log(err);
+  });
